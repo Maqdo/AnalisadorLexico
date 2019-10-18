@@ -108,30 +108,80 @@ class Analisador_Lexico():
                             i += 1
                             char_atual = linha_codigo[i]
 
-                            while self.verNumeros(char) and i+1 < tam_linha:
+                            while self.verNumeros(char_atual) and i+1 < tam_linha:
                                 j += 1
                                 aux += char_atual
                                 i += 1
                                 char_atual = linha_codigo[i]
 
-                            if(caracter_atual == '.'):
-                                j = 0
+                            if(char_atual == '.'):
+								j = 0
                                 #Tratamento de erro
-                                while (i+1 < tam_linha):
-                                i += 1
-                                char_atual = linha_codigo[i]
-                                if self.verDelimitador(char_atual) or char_atual == ' ':
-                                    i -= 1 #Volta um elemento da linha para que o delimitador seja reconhecido no momento certo
-                                    break
+                                while i+1 < tam_linha:
+									i += 1
+									char_atual = linha_codigo[i]
+									if self.verDelimitador(char_atual) or char_atual == ' ':
+										i -= 1 #Volta um caractere da linha para que o delimitador seja reconhecido no momento certo
+										break
                         else:
-                        arquivo_saida.write('Erro Lexico - Numero mal formado - Linha: %d\n' %nLinha)
-
+							arquivo_saida.write('Erro Lexico - Numero mal formado - Linha: %d\n' %nLinha)
                         if (j > 0):
-                        arquivo_saida.write(aux+'->'+str(nLinha)+'\n')
+							arquivo_saida.write(aux+'->'+str(nLinha)+'\n')
                         else: 
-                        arquivo_saida.write('Erro Lexico - Numero mal formado - Linha: %d\n' %nLinha)
+							arquivo_saida.write('Erro Lexico - Numero mal formado - Linha: %d\n' %nLinha)
                     else:
                         arquivo_saida.write(aux+'->'+str(nLinha)+'\n')
                         if(not self.verNumeros(char_atual)):
                             i -= 1
-                    
+				#Palavras reservadas
+				elif self.verLetras(char_atual):
+					#Caso o primeiro caractere seja uma letra, vou percorrendo o identificador até o final do identificador ou linha
+					aux = char_atual
+					i += 1
+					erro = False
+					while i < tam_linha:
+						prox_char = None
+						char_atual = linha_codigo[i]
+						if i+1 < tam_linha:
+							prox_char = linha_codigo[i+1]
+						if self.verLetras(char_atual) or self.verNumeros(char_atual) or char_atual == '_':
+							aux += char_atual
+						elif self.verDelimitador(char_atual) or char_atual == ' ' or char_atual == '\t' or char_atual == '\r':
+							i -= 1 #Volta um caractere da linha para que o delimitador seja reconhecido no momento certo
+							break
+						elif char_seguinte != None and self.verOperadores(char_atual+prox_char) or self.verOperadores(char_atual):
+							i -= 1
+							break
+						elif char_atual != '\n':
+							arquivo_saida.write("Erro Lexico - Identificador com caracter invalido: "+caracter_atual+" - linha: %d\n" %nLinha)
+							erro = True
+							break
+						i += 1 #Continua para o próximo caractere até o final da palavra
+					
+
+					if (erro):
+						while (i+1 < tam_linha):
+							i += 1
+							char_atual = linha_codigo[i]
+							if self.verDelimitador(char_atual) or char_atual == ' ' or char_atual == '\t' or char_atual == '\r' or char_atual == '/':
+								i -= 1 #Volta um caractere da linha para que o delimitador seja reconhecido no momento certo
+								break
+					else: #Se nao houver erros basta verificar se o elemento é uma palavra reservada
+						if (self.verReservada(aux)):
+							arquivo_saida.write(self.qualTokenReservada(string_temp)+'_'+string_temp+'->'+str(nLinha)+'\n')
+						else:
+							arquivo_saida.write(aux+'->'+str(nLinha)+'\n') #Identificador
+				#Caractere invalido
+				elif char_atual != '\n' and char_atual != ' ' and char_atual != '\t' and char_atual != '\r':
+					arquivo_saida.write('Erro Lexico - Caracter Invalido: ' + char_atual + ' - linha: %d\n' %nLinha)
+				#Indo para o próximo caractere da linha
+				i += 1
+			linha_codigo = arquivo_entrada.readline() # Le a proxima linha
+			nLinha += 1
+		#Fim do programa
+		arquivo_entrada.close()
+		arquivo_saida.close
+
+# Executando o programa
+analisador_lexico = AnalisadorLexico()
+analisador_lexico.analisador()
