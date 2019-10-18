@@ -114,21 +114,21 @@ class Analisador_Lexico():
                                 i += 1
                                 char_atual = linha_codigo[i]
 
-                            if(char_atual == '.'):
-								j = 0
+				if(char_atual == '.'):
+				j = 0
                                 #Tratamento de erro
-                                while i+1 < tam_linha:
-									i += 1
-									char_atual = linha_codigo[i]
-									if self.verDelimitador(char_atual) or char_atual == ' ':
-										i -= 1 #Volta um caractere da linha para que o delimitador seja reconhecido no momento certo
-										break
+				while i+1 < tam_linha:
+					i += 1
+					char_atual = linha_codigo[i]
+					if self.verDelimitador(char_atual) or char_atual == ' ':
+						i -= 1 #Volta um caractere da linha para que o delimitador seja reconhecido no momento certo
+						break
                         else:
-							arquivo_saida.write('Erro Lexico - Numero mal formado - Linha: %d\n' %nLinha)
+				arquivo_saida.write('Erro Lexico - Numero mal formado - Linha: %d\n' %nLinha)
                         if (j > 0):
-							arquivo_saida.write(aux+'->'+str(nLinha)+'\n')
-                        else: 
-							arquivo_saida.write('Erro Lexico - Numero mal formado - Linha: %d\n' %nLinha)
+				arquivo_saida.write(aux+'->'+str(nLinha)+'\n')
+                        else:
+				arquivo_saida.write('Erro Lexico - Numero mal formado - Linha: %d\n' %nLinha)
                     else:
                         arquivo_saida.write(aux+'->'+str(nLinha)+'\n')
                         if(not self.verNumeros(char_atual)):
