@@ -1,0 +1,22 @@
+program->1
+nome->1
+;
+{
+exemplo->2
+1->2
+}
+var->3
+a->3
+,
+a1->3
+,
+Erro Lexico - Identificador com caracter invalido: : - linha: 3
+integer->3
+;
+begin->4
+read->5
+(
+ab->5
+,
+3.4->5
+;
