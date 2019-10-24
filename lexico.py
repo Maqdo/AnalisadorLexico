@@ -99,6 +99,8 @@ class AnalisadorLexico():
         arquivo_entrada = open(self.arquivo_e, "r")
         #Abre o arquivo de saida
         arquivo_saida = open(self.arquivo_s, "w")
+
+        listaTokens = []
         
         #Le a primeira linha
         linha_codigo = arquivo_entrada.readline()
@@ -118,15 +120,18 @@ class AnalisadorLexico():
                 #Delimitador
                 if self.verDelimitador(char_atual):
                     arquivo_saida.write(self.tokenDelimitador(char_atual)+' '+char_atual+'->'+str(nLinha)+'\n')
+                    listaTokens.append(char_atual)
                 #Comentarios
                 elif char_atual == "/" and prox_char == "/":
                     i = tam_linha
                 #Operador
                 elif prox_char != None and self.verOperadores(char_atual+prox_char):
                     arquivo_saida.write(self.tokenOperador(char_atual+prox_char)+' '+char_atual+prox_char+'->'+str(nLinha)+'\n')
+                    listaTokens.append(char_atual+prox_char)
                     i += 1
                 elif self.verOperadores(char_atual):
                     arquivo_saida.write(self.tokenOperador(char_atual)+' '+char_atual+'->'+str(nLinha)+'\n')
+                    listaTokens.append(char_atual)
                 #Numero
                 elif self.verNumeros(char_atual):
                     aux = char_atual
@@ -134,7 +139,7 @@ class AnalisadorLexico():
                     j = 0 #Verificacao de numero apohs a virgula
                     char_atual = linha_codigo[i]
                     
-                    #Verifica se o(s) proximo(s) caractere(s) e(sao) numero(s)
+                    #Verifica se o(s) proximo(s) caractere(s) eh(sao) numero(s)
                     while (self.verNumeros(char_atual) and (i+1 < tam_linha)):
                         aux += char_atual
                         i += 1
@@ -152,7 +157,7 @@ class AnalisadorLexico():
                                 i += 1
                                 char_atual = linha_codigo[i]
                             
-                            if(char_atual == '.'):
+                            if(char_atual == "."):
                                 j = 0
                                 #Tratamento de erro
                             while i+1 < tam_linha:
@@ -163,11 +168,14 @@ class AnalisadorLexico():
                                     break
                         else:
                             arquivo_saida.write('Erro Lexico - Numero mal formado - Linha: %d\n' %nLinha)
+                        
                         if (j > 0):
+                            listaTokens.append(aux)
                             arquivo_saida.write('token '+aux+'->'+str(nLinha)+'\n')
                         else:
                             arquivo_saida.write('Erro Lexico - Numero mal formado - Linha: %d\n' %nLinha)
-                    else:
+                    else: #Tratar quando eh letra, operador ou simbolo invalido
+                        listaTokens.append(aux)
                         arquivo_saida.write('token '+aux+'->'+str(nLinha)+'\n')
                         if(not self.verNumeros(char_atual)):
                             i -= 1
@@ -202,12 +210,14 @@ class AnalisadorLexico():
                             i += 1
                             char_atual = linha_codigo[i]
                             if self.verDelimitador(char_atual) or self.verEspace(char_atual): #char_atual == ' ' or char_atual == '\t' or char_atual == '\r' or char_atual == '/':
-								i -= 1 #Volta um caractere da linha para que o delimitador seja reconhecido no momento certo
-								break
+                                i -= 1 #Volta um caractere da linha para que o delimitador seja reconhecido no momento certo
+                                break
                     else: #Se nao houver erros basta verificar se o elemento eh uma palavra reservada
                         if (self.verReservada(aux)):
+                            listaTokens.append(aux)
                             arquivo_saida.write(self.tokenReservada(aux)+" "+aux+'->'+str(nLinha)+'\n')
                         else:
+                            listaTokens.append(aux)
                             arquivo_saida.write('token '+aux+'->'+str(nLinha)+'\n') #Identificador
 				#Caractere invalido
                 elif not self.verEspace(char_atual): #char_atual != '\n' and char_atual != ' ' and char_atual != '\t' and char_atual != '\r':
@@ -220,6 +230,8 @@ class AnalisadorLexico():
             
             linha_codigo = arquivo_entrada.readline() # Le a proxima linha
             nLinha += 1
+        
+        print(listaTokens)
 		#Fim do programa
         arquivo_entrada.close()
         arquivo_saida.close
@@ -227,3 +239,4 @@ class AnalisadorLexico():
 # Executando o programa
 analisador_lexico = AnalisadorLexico()
 analisador_lexico.analisador()
+
