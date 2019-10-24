@@ -1,5 +1,6 @@
 program nome;
+asfsgd@$#gdj456
 {exemplo 1}
-var a, a1a8, b: integer; // variaveis
+var a, a1a8, b, 3a: integer; // variaveis
 begin
-read(a >= b,3.4);
+read(ab >= b,3.4c);
